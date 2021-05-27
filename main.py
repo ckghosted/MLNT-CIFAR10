@@ -39,12 +39,13 @@ parser.add_argument('--meta_lr', default=0.4, type=float)
 parser.add_argument('--gamma_init', default=0.99, type=float, help='Initial exponential moving average weight for the teacher model')
 parser.add_argument('--seed', default=123)
 parser.add_argument('--gpuid', default=1, type=int)
-parser.add_argument('--id', default='MLNT')
+parser.add_argument('--id', default='mlnt')
 parser.add_argument('--dataset', default='cifar10', type=str)
 parser.add_argument('--noise_ratio', default=0.5, type=float, help='noise ratio')
 parser.add_argument('--noise_mode', default='sym', help='sym or asym')
 parser.add_argument('--data_path', default='./data', type=str, help='path to dataset')
 parser.add_argument('--checkpoint', default='cross_entropy')
+parser.add_argument('--run', default=0, type=int, help='run id (0, 1, 2, 3, or 4) to specify the version of noisy labels')
 args = parser.parse_args()
 
 random.seed(args.seed)
@@ -282,12 +283,13 @@ print('number of neighbor: %d\n'%args.num_neighbor)
 print('ramp-up end epoch of the meta-learning rate: %d\n'%args.rampup_epoch)
 print('LR decay epoch: %d\n'%args.lrdecay_epoch)
 
-save_point = './checkpoint/%s_%s%s_M%dn%drho%s.pth.tar'%(args.id,
-                                                         args.noise_mode,
-                                                         ''.join(str(args.noise_ratio).split('.')),
-                                                         args.num_fast,
-                                                         args.num_neighbor,
-                                                         ''.join(str(args.perturb_ratio).split('.')))
+save_point = './checkpoint/%s_%s%s_run%d_M%dn%drho%s.pth.tar'%(args.id,
+                                                               args.noise_mode,
+                                                               ''.join(str(args.noise_ratio).split('.')),
+                                                               args.run,
+                                                               args.num_fast,
+                                                               args.num_neighbor,
+                                                               ''.join(str(args.perturb_ratio).split('.')))
 
 loader = dataloader.cifar_dataloader(dataset=args.dataset,
                                      noise_ratio=args.noise_ratio,
@@ -297,9 +299,10 @@ loader = dataloader.cifar_dataloader(dataset=args.dataset,
                                      root_dir=args.data_path,
                                      # log=stats_log,
                                      train_val_split_file='%s/train_val_split.json'%args.data_path,
-                                     noise_file='%s/%s%s.json'%(args.data_path,
-                                                                args.noise_mode,
-                                                                ''.join(str(args.noise_ratio).split('.'))))
+                                     noise_file='%s/%s%s_run%d.json'%(args.data_path,
+                                                                      args.noise_mode,
+                                                                      ''.join(str(args.noise_ratio).split('.'))
+                                                                      args.run))
 train_loader,val_loader,test_loader = loader.run()
 
 best = 0

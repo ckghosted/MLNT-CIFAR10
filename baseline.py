@@ -34,6 +34,7 @@ parser.add_argument('--dataset', default='cifar10', type=str)
 parser.add_argument('--noise_ratio', default=0.5, type=float, help='noise ratio')
 parser.add_argument('--noise_mode', default='sym', help='sym or asym')
 parser.add_argument('--data_path', default='./data', type=str, help='path to dataset')
+parser.add_argument('--run', default=0, type=int, help='run id (0, 1, 2, 3, or 4) to specify the version of noisy labels')
 args = parser.parse_args()
 
 torch.manual_seed(args.seed)
@@ -118,11 +119,12 @@ def val(epoch):
     if acc > best_acc:
         best_acc = acc
         print('| Saving Best Model ...')
-        save_point = './checkpoint/%s_%s%s_lr%s_ep%s.pth.tar'%(args.id,
-                                                               args.noise_mode,
-                                                               ''.join(str(args.noise_ratio).split('.')),
-                                                               ''.join(str(args.lr).split('.')),
-                                                               args.num_epochs)
+        save_point = './checkpoint/%s_%s%s_run%d_lr%s_ep%s.pth.tar'%(args.id,
+                                                                     args.noise_mode,
+                                                                     ''.join(str(args.noise_ratio).split('.')),
+                                                                     args.run,
+                                                                     ''.join(str(args.lr).split('.')),
+                                                                     args.num_epochs)
         save_checkpoint({
             'state_dict': net.state_dict(),
         }, save_point) 
@@ -165,9 +167,10 @@ loader = dataloader.cifar_dataloader(dataset=args.dataset,
                                      root_dir=args.data_path,
                                      # log=stats_log,
                                      train_val_split_file='%s/train_val_split.json'%args.data_path,
-                                     noise_file='%s/%s%s.json'%(args.data_path,
-                                                                args.noise_mode,
-                                                                ''.join(str(args.noise_ratio).split('.'))))
+                                     noise_file='%s/%s%s_run%d.json'%(args.data_path,
+                                                                      args.noise_mode,
+                                                                      ''.join(str(args.noise_ratio).split('.')),
+                                                                      args.run))
 train_loader,val_loader,test_loader = loader.run()
 
 best_acc = 0
@@ -195,11 +198,12 @@ for epoch in range(1, 1+args.num_epochs):
     # val(epoch)
 
 print('\nTesting model')
-checkpoint = torch.load('./checkpoint/%s_%s%s_lr%s_ep%s.pth.tar'%(args.id,
-                                                                  args.noise_mode,
-                                                                  ''.join(str(args.noise_ratio).split('.')),
-                                                                  ''.join(str(args.lr).split('.')),
-                                                                  args.num_epochs))
+checkpoint = torch.load('./checkpoint/%s_%s%s_run%d_lr%s_ep%s.pth.tar'%(args.id,
+                                                                        args.noise_mode,
+                                                                        ''.join(str(args.noise_ratio).split('.')),
+                                                                        args.run,
+                                                                        ''.join(str(args.lr).split('.')),
+                                                                        args.num_epochs))
 test_net.load_state_dict(checkpoint['state_dict'])
 with torch.no_grad():
     test()
