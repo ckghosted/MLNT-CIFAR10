@@ -301,7 +301,7 @@ loader = dataloader.cifar_dataloader(dataset=args.dataset,
                                      train_val_split_file='%s/train_val_split.json'%args.data_path,
                                      noise_file='%s/%s%s_run%d.json'%(args.data_path,
                                                                       args.noise_mode,
-                                                                      ''.join(str(args.noise_ratio).split('.'))
+                                                                      ''.join(str(args.noise_ratio).split('.')),
                                                                       args.run))
 train_loader,val_loader,test_loader = loader.run()
 
