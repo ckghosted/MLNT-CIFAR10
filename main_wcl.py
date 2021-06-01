@@ -308,13 +308,14 @@ print('number of neighbor: %d\n'%args.num_neighbor)
 print('ramp-up end epoch of the meta-learning rate: %d\n'%args.rampup_epoch)
 print('LR decay epoch: %d\n'%args.lrdecay_epoch)
 
-save_point = './checkpoint/%s_%s%s_run%d_M%dn%drho%s.pth.tar'%(args.id,
-                                                               args.noise_mode,
-                                                               ''.join(str(args.noise_ratio).split('.')),
-                                                               args.run,
-                                                               args.num_fast,
-                                                               args.num_neighbor,
-                                                               ''.join(str(args.perturb_ratio).split('.')))
+save_point = './checkpoint/%s_%s%s_run%d_M%dn%drho%sw%s.pth.tar'%(args.id,
+                                                                  args.noise_mode,
+                                                                  ''.join(str(args.noise_ratio).split('.')),
+                                                                  args.run,
+                                                                  args.num_fast,
+                                                                  args.num_neighbor,
+                                                                  ''.join(str(args.perturb_ratio).split('.')),
+                                                                  ''.join(str(args.init_weight).split('.')))
 
 loader = dataloader.cifar_dataloader(dataset=args.dataset,
                                      noise_ratio=args.noise_ratio,
