@@ -46,7 +46,8 @@ parser.add_argument('--noise_mode', default='sym', help='sym or asym')
 parser.add_argument('--data_path', default='./data', type=str, help='path to dataset')
 parser.add_argument('--checkpoint', default='cross_entropy')
 parser.add_argument('--run', default=0, type=int, help='run id (0, 1, 2, 3, or 4) to specify the version of noisy labels')
-parser.add_argument('--T', default=10, type=int)
+parser.add_argument('--T', default=10.0, type=float, help='Inverse temperature for the weight')
+parser.add_argument('--init_weight', default=0.5, type=float, help='Default weight')
 args = parser.parse_args()
 
 random.seed(args.seed)
@@ -113,7 +114,7 @@ def train(epoch):
                 targets_fast = targets.clone()
                 randidx = torch.randperm(targets.size(0))
                 # print('targets.size:', targets.size())
-                loss_weights = torch.cuda.FloatTensor(targets.size()).fill_(0.5)
+                loss_weights = torch.cuda.FloatTensor(targets.size()).fill_(args.init_weight)
                 # print('loss_weights.requires_grad: ', loss_weights.requires_grad)
                 # print('loss_weights:', loss_weights)
                 for n in range(int(targets.size(0)*args.perturb_ratio)):
@@ -142,7 +143,7 @@ def train(epoch):
                     # print('frac_old:', frac_old)
                     frac_new = torch.true_divide(label_histogram[targets_fast[idx]], args.num_neighbor+1)
                     # print('frac_new:', frac_new)
-                    loss_weights[idx] = torch.sigmoid(torch.log(torch.true_divide(label_histogram[targets[idx]], label_histogram[targets_fast[idx]])) * args.T)
+                    loss_weights[idx] = 2 * args.init_weight * torch.sigmoid(torch.log(torch.true_divide(label_histogram[targets[idx]], label_histogram[targets_fast[idx]])) * args.T)
                     # print('loss_weights[%d]:' % idx, loss_weights[idx])
                     
                 fast_loss = criterion(outputs,targets_fast)
