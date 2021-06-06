@@ -342,11 +342,18 @@ print('| Initial Learning Rate = ' + str(args.lr))
 
 for epoch in range(1, 1+args.num_epochs):
     train(epoch)
-    if epoch%2==0:
-        print('\nTesting model')
-        best_model = torch.load(save_point)
-        test_net.load_state_dict(best_model['state_dict'])
-        with torch.no_grad():
-            test()
+    # if epoch%2==0:
+    #     print('\nTesting model')
+    #     best_model = torch.load(save_point)
+    #     test_net.load_state_dict(best_model['state_dict'])
+    #     with torch.no_grad():
+    #         test()
+
+# Run testing only once using the best model
+print('\nTesting model')
+best_model = torch.load(save_point)
+test_net.load_state_dict(best_model['state_dict'])
+with torch.no_grad():
+    test()
 
 # record.close()
