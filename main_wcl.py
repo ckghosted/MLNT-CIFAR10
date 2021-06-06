@@ -293,6 +293,13 @@ def test():
     # record.flush()
     # print('\nTest Acc: %f\n'%test_acc)
     
+def float_to_filename(num):
+    split_result = str(num).split('.')
+    if split_result[1] == '0':
+        return split_result[0]
+    else:
+        return ''.join(split_result)
+
 # ===============================================
 # record=open('./checkpoint/'+args.id+'.txt','w')
 # record.write('learning rate: %f\n'%args.lr)
@@ -310,12 +317,12 @@ print('LR decay epoch: %d\n'%args.lrdecay_epoch)
 
 save_point = './checkpoint/%s_%s%s_run%d_M%dn%drho%sw%s.pth.tar'%(args.id,
                                                                   args.noise_mode,
-                                                                  ''.join(str(args.noise_ratio).split('.')),
+                                                                  float_to_filename(args.noise_ratio),
                                                                   args.run,
                                                                   args.num_fast,
                                                                   args.num_neighbor,
-                                                                  ''.join(str(args.perturb_ratio).split('.')),
-                                                                  ''.join(str(args.init_weight).split('.')))
+                                                                  float_to_filename(args.perturb_ratio),
+                                                                  float_to_filename(args.init_weight))
 
 loader = dataloader.cifar_dataloader(dataset=args.dataset,
                                      noise_ratio=args.noise_ratio,
